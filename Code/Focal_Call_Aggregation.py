@@ -4,7 +4,7 @@ import os
 import pandas as pd
 import glob
 from scipy.io import loadmat
-os.chdir("C:\\Users\\ghg7\\Desktop\\MP Data\\Focal Whale Call Data w GPS")
+os.chdir("V:\\MP Data\\Focal Whale Call Data w GPS")
 
 #%% Import Date/Time Data - test commit 
 
