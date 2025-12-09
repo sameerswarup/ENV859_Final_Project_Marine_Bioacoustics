@@ -42,7 +42,7 @@ out_path = r"/Users/sameerswarup/Documents/Duke MEM Classes/Fall 2025/Advanced_G
 out_fc = r"Filtered_Parents_Points"
 source_id_field = "Tag"  # Column in CSV to use as ID
 
-# Create a point feature class with WGS84 coordinates
+# Create a point feature class with WGS84 coordinates from entries in Filtered_Parents
 arcpy.management.XYTableToPoint(
     in_table=filtered_parents_csv_path,
     out_feature_class=f"{out_path}\\{out_fc}",
