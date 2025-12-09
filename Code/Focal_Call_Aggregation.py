@@ -3,7 +3,10 @@ import numpy as np
 import os
 import pandas as pd
 import glob
-os.chdir("V:\\MP Data\\Focal Whale Call Data w GPS")
+import arcpy
+import csv
+#os.chdir("V:\\MP Data\\Focal Whale Call Data w GPS")
+os.chdir(r"/Users/sameerswarup/Documents/Duke MEM Classes/Fall 2025/Advanced_GIS/ENV859_Final_Project_Marine_Bioacoustics/Data")
 
 #%% Import Parent .csv files with Call and Coordinate Data integrated from single files
 
@@ -31,3 +34,33 @@ filtered_data = merged_data[merged_data["time_diff"] <= pd.Timedelta(minutes=90)
 
 # Export filtered results to CSV
 filtered_data.to_csv("Filtered_Parents.csv", index=False)
+
+#%% Create ArcGIS point objects out of entries in Filtered_Parents.csv
+
+filtered_parents_csv_path = r"/Users/sameerswarup/Documents/Duke MEM Classes/Fall 2025/Advanced_GIS/ENV859_Final_Project_Marine_Bioacoustics/Data/Filtered_Parents.csv"
+out_path = r"/Users/sameerswarup/Documents/Duke MEM Classes/Fall 2025/Advanced_GIS/ENV859_Final_Project_Marine_Bioacoustics/Data/"
+out_fc = r"Filtered_Parents_Points"
+source_id_field = "Tag"  # Column in CSV to use as ID
+
+# Create a point feature class with WGS84 coordinates
+arcpy.management.XYTableToPoint(
+    in_table=filtered_parents_csv_path,
+    out_feature_class=f"{out_path}\\{out_fc}",
+    x_field="Longitude",
+    y_field="Latitude",
+    coordinate_system=arcpy.SpatialReference(4326)  # WGS84
+)
+
+# Add ID field
+arcpy.management.AddField(f"{out_path}\\{out_fc}", "ID", "LONG")
+
+# Copy values from CSV column to ID field
+with arcpy.da.UpdateCursor(f"{out_path}\\{out_fc}", ["ID"]) as cursor, \
+     open(filtered_parents_csv_path, "r") as f:
+    
+    reader = csv.DictReader(f)
+    rows = list(reader)
+    
+    for i, row in enumerate(cursor):
+        # Assign the ID from CSV (assumes order matches XYTableToPoint)
+        cursor.updateRow([int(rows[i][source_id_field])])
